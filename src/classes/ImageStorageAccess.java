@@ -1,10 +1,13 @@
 package classes;
 
 
+import java.io.ByteArrayInputStream;
+
 // Object to deal with the actual communication with s3.  Allows us to upload a file.
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -20,6 +23,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.util.IOUtils;
 
 public class ImageStorageAccess {
 	
@@ -48,13 +52,19 @@ public class ImageStorageAccess {
         s3client.setRegion(usWest2);
      
 		try {
-	        System.out.println("Uploading a new object to S3 from a file");
+			
+			InputStream stream = new ByteArrayInputStream(image);
+
+			ObjectMetadata meta = new ObjectMetadata();
+			meta.setContentLength(image.length);
+			meta.setContentType("image/png");
+			
 	        FileOutputStream fileOutputStream;
-	        System.out.println("File name will be: " + uploadFileName); 
-	        File dummyFile = new File(uploadFileName);
+	        File dummyFile = new File(uploadFileName + ".jpg");
 	        
 	        // Write the byte array containing the image into a file.
 	        try { 
+	        	
 	        	if(!dummyFile.exists()){
 		        	dummyFile.createNewFile();
 		        }
@@ -64,6 +74,7 @@ public class ImageStorageAccess {
 	            fileOutputStream.close();
 	        }
 	        catch(Exception e){
+	        	
 	            	System.out.println("Outputstream error");
 	            	System.err.println(e);
 	        }
@@ -71,11 +82,13 @@ public class ImageStorageAccess {
 	        // Using the file we just wrote, put it into the S3 bucket, with the key being
 	        // the key name we specified in the constructor.
 	        s3client.putObject(new PutObjectRequest(
-	        		                 bucketName, keyName, dummyFile));
+	        		                 bucketName, keyName + ".png", stream, meta));
 	        
 
 	        // In case of errors, print to console to debug.
-	     } catch (AmazonServiceException ase) {
+	     } 
+		catch (AmazonServiceException ase) {
+			
 	        System.out.println("Caught an AmazonServiceException, which " +  
 	        		"means your request made it " +
 	                "to Amazon S3, but was rejected with an error response" +

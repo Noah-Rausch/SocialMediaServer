@@ -11,11 +11,13 @@ public class UserDao implements IUserDao{
 	String usernameToSearch;
 
 	public UserDao (User u){
+		
 		this.db = new JDBC();
 		this.user = u;
 	}
 
 	public UserDao(String un){
+		
 		this.db = new JDBC();
 		this.usernameToSearch = un;
 	}
@@ -23,6 +25,7 @@ public class UserDao implements IUserDao{
 	// Method that adds the passed user to the database.  Returns the result as a string.
 	@Override
 	public String addUser() {
+		
 		String createAccResult = "";
 		String usernameWithQuotes = "'" + user.getUsername() + "'";
 		String emailWithQuotes = "'" + user.getEmail() + "'";
@@ -33,19 +36,25 @@ public class UserDao implements IUserDao{
 		// Create a separate table that will hold this user's friends.
 		ResultSet rs = db.selectQuery(queryStr);
 		try {
+			
 			if(rs != null && rs.next()){
+				
 				createAccResult = "username taken";
 			}
 		}
         catch (SQLException e) {
+        	
         	e.printStackTrace();
         }
 
 		queryStr = "SELECT * FROM USERS WHERE email = " + emailWithQuotes;
 		rs = db.selectQuery(queryStr);
 		try {
+			
 			if(rs != null && rs.next()){
+				
 				if(createAccResult.equalsIgnoreCase("")){
+					
 					createAccResult = "email taken";
 				}
 				else{
@@ -54,12 +63,16 @@ public class UserDao implements IUserDao{
 			}
 		}
 		catch (SQLException e) {
+			
 			e.printStackTrace();
 		}
         
+		
 		// Let the client know which entries are already in use.  The string "createAccResult should
 		// have been appended the info needed to let the user know.
+		
         if(createAccResult.equalsIgnoreCase("")){
+        	
         	// Create the account and let the user know.
         	String sqlStr = "INSERT INTO USERS " + "VALUES(" + 0 + "," + usernameWithQuotes + "," + emailWithQuotes + "," + passwordWithQuotes + ")";
         	db.putQuery(sqlStr);
@@ -73,17 +86,21 @@ public class UserDao implements IUserDao{
 
 	@Override
 	public User getUser(String username) {
+		
 		User userToReturn = new User();
 		String usernameWithQuotes = "'" + username + "'";
 		String selectQuery = "SELECT * FROM USERS WHERE username = " + usernameWithQuotes;
 		ResultSet rs = db.selectQuery(selectQuery);
 		try{
+			
 			if(rs.next()){
+				
 				userToReturn.setUsername(username);
 				userToReturn.setEmail(rs.getString("email"));
 				userToReturn.setResponseMessage("found");
 			}
 			else{
+				
 				userToReturn.setResponseMessage("not found");
 			}
 		}
@@ -96,12 +113,14 @@ public class UserDao implements IUserDao{
 
 	@Override
 	public void removeUser() {
+		
 		// TODO Auto-generated method stub
-
 	}
 
+	
 	@Override
 	public String verifyUser() {
+		
 		System.out.println("Verifying User");
 		String usernameWithQuotes = "'" + user.getUsername() + "'";
 		String queryStr = "SELECT * FROM USERS WHERE username = " + usernameWithQuotes;
@@ -111,18 +130,23 @@ public class UserDao implements IUserDao{
         // Otherwise, the user doesn't even exist.
         String result = "User doesn't exist";
         try {
+        	
         	if(rs.next()){
+        		
         		String passFromDB = rs.getString("password");
         		if(passFromDB.equals(user.getPassword())){
+        			
         			// Password matches the one inputed.
         			result = "Login Successful";
         		}
         		else{
+        			
         			result = "Incorrect Password";
         		}
         	}
         }
         catch (SQLException e) {
+        	
         	e.printStackTrace();
         }
         

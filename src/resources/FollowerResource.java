@@ -61,6 +61,23 @@ public class FollowerResource {
 	}
 	
 	
+	// Get friends of friends.
+	@GET
+	@Path("/{sender}/potential")
+	@Produces(MediaType.APPLICATION_JSON)
+	public FollowRequest getUsersIMayKnow(@PathParam("sender")String username){
+		
+		System.out.println("Reached resource");
+		
+		User user = new User();
+		user.setUsername(username);
+		FollowRequest followRequest = new FollowRequest();
+		followRequest.setSender(user);
+		FollowRequestDao dao = new FollowRequestDao(followRequest);
+		return dao.getUsersIMayKnow();
+	}
+	
+	
 	// Delete a person the current user is following from their list.
 	@DELETE
 	@Path("{senderAndUserToDelete}")

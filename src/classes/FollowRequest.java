@@ -8,6 +8,7 @@ public class FollowRequest {
 	private User toBeFollowed;
 	private ArrayList<User> usersIFollow;
 	private ArrayList<User> usersWhoFollowMe;
+	private ArrayList<String> usersIMayKnow;
 	private String responseMessage;
 	
 	public FollowRequest(){
@@ -49,6 +50,15 @@ public class FollowRequest {
 
 	public void setUsersWhoFollowMe(ArrayList<User> usersWhoFollowMe) {
 		this.usersWhoFollowMe = usersWhoFollowMe;
+	}
+	
+
+	public ArrayList<String> getUsersIMayKnow() {
+		return usersIMayKnow;
+	}
+
+	public void setUsersIMayKnow(ArrayList<String> usersIMayKnow) {
+		this.usersIMayKnow = usersIMayKnow;
 	}
 
 	public String getResponseMessage() {

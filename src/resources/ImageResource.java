@@ -36,19 +36,47 @@ public class ImageResource {
 	
 	// Get a list of all the images sent to user.
 	@GET
-	@Path("/{sender}")
+	@Path("/{sender}/{instruction}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ImageModel getImages(@PathParam("sender") String sender){
+	public ImageModel getImages(@PathParam("sender") String sender, @PathParam("instruction") String instruction){
 		
 		ImageModel imageModel = new ImageModel();
-		// "Sender" field of ImageModel requires an arrayList.  Make a new one and set the only
-		// element to the same of the sender who wants their photos.
-		ArrayList<String> senderList = new ArrayList<>();
-		senderList.add(sender);
-		imageModel.setSender(senderList);
-		ImageModelDao imageModelDao = new ImageModelDao(imageModel);
-		return imageModelDao.getImages();
+		if(instruction.equals("forVote")){
+			
+			System.out.println("Getting images for vote");
+			// If the instruction is to get the images to vote on, just get the images
+			// that have been sent by people this user is following.  This only gets
+			// the images that have been taken recently and you haven't seen yet.
+			ArrayList<String> senderList = new ArrayList<>();
+			senderList.add(sender);
+			imageModel.setSender(senderList);
+			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
+			return imageModelDao.getImagesToVote();
+		}
+		else if(instruction.equals("forCircle")){
+			
+			System.out.println("Getting images for circle");
+			// If the instruction is 'forCircle', we are also getting all the images
+			// sent by users we follow, but ones that have been voted on.
+			ArrayList<String> senderList = new ArrayList<>();
+			senderList.add(sender);
+			imageModel.setSender(senderList);
+			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
+			return imageModelDao.getImagesPeopleIFollow();
+		}
+		else{
+			
+			System.out.println("Getting images for world");
+			// If the instruction was "forWorld", we are displaying the highest rated images from
+			// the database, regardless of who sent them.
+			ArrayList<String> senderList = new ArrayList<>();
+			senderList.add(sender);
+			imageModel.setSender(senderList);
+			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
+			return imageModelDao.getImagesForWorld();
+		}
 	}
+	
 	
 	
 	// Delete a single image from the database

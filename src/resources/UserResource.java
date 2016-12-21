@@ -23,6 +23,7 @@ public class UserResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public User createAccount(User user) {
+		
 		UserDao userDao = new UserDao(user);
 		String result = userDao.addUser();
 		user.setResponseMessage(result);
@@ -37,6 +38,7 @@ public class UserResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public User loginAccount(User user) {
+		
 		UserDao userDao = new UserDao(user);
 		String result = userDao.verifyUser();
 		user.setResponseMessage(result);
@@ -49,6 +51,7 @@ public class UserResource {
 	@Path("/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getUser(String username) {
+		
 		UserDao userDao = new UserDao(username);
 		User user = userDao.getUser(username);
 		return user;
