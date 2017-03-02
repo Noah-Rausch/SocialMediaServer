@@ -2,90 +2,71 @@ package resources;
 
 import java.util.ArrayList;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 
-import classes.ImageModel;
-import classes.ImageModelDao;
+import dao.ImageDao;
+import domain.Image;
+import domain.ImageWrapper;
+import service.ImageService;
 
 @Provider
 @Path("/images")
-public class ImageResource {
+public class ImageResource implements IImageResource {
 	
-	// Post in image to the server.
-	@POST
-	@Path("/add")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public ImageModel postImage(ImageModel image){
-		
-		// FOR DEBUGGING
-		System.out.println("Image made it to server");
-		
-		ImageModelDao imageModelDao = new ImageModelDao(image);
-		return imageModelDao.postImage();
+	
+	@Override
+	public ImageWrapper postImage(ImageWrapper image) {
+
+		ImageService service = new ImageService(new ImageDao(image));
+		return service.post();
 	}
-	
-	
-	// Get a list of all the images sent to user.
-	@GET
-	@Path("/{sender}/{instruction}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public ImageModel getImages(@PathParam("sender") String sender, @PathParam("instruction") String instruction){
+
+
+
+	@Override
+	public ImageWrapper voteOnImage(ImageWrapper image) {
+
+		ImageDao imageDao = new ImageDao();
+		return imageDao.vote(image.getImageList().get(0).getUrl());
+	}
+
+
+
+	@Override
+	public ImageWrapper getImages(String sender, String instruction) {
+
+		ImageWrapper imageWrapper = new ImageWrapper();
+		Image image = new Image();
+		image.setSender(sender);
+		ArrayList<Image> pics = new ArrayList<>();
+		pics.add(image);
+		imageWrapper.setImageList(pics);
+		ImageDao imageDao = new ImageDao(imageWrapper);
 		
-		ImageModel imageModel = new ImageModel();
 		if(instruction.equals("forVote")){
 			
 			System.out.println("Getting images for vote");
-			// If the instruction is to get the images to vote on, just get the images
-			// that have been sent by people this user is following.  This only gets
-			// the images that have been taken recently and you haven't seen yet.
-			ArrayList<String> senderList = new ArrayList<>();
-			senderList.add(sender);
-			imageModel.setSender(senderList);
-			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
-			return imageModelDao.getImagesToVote();
+			imageWrapper.setImageList(pics);
+			return imageDao.getImagesToVote();
 		}
 		else if(instruction.equals("forCircle")){
 			
 			System.out.println("Getting images for circle");
-			// If the instruction is 'forCircle', we are also getting all the images
-			// sent by users we follow, but ones that have been voted on.
-			ArrayList<String> senderList = new ArrayList<>();
-			senderList.add(sender);
-			imageModel.setSender(senderList);
-			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
-			return imageModelDao.getImagesPeopleIFollow();
+			return imageDao.getImagesPeopleIFollow();
 		}
 		else{
 			
 			System.out.println("Getting images for world");
-			// If the instruction was "forWorld", we are displaying the highest rated images from
-			// the database, regardless of who sent them.
-			ArrayList<String> senderList = new ArrayList<>();
-			senderList.add(sender);
-			imageModel.setSender(senderList);
-			ImageModelDao imageModelDao = new ImageModelDao(imageModel);
-			return imageModelDao.getImagesForWorld();
+			return imageDao.getImagesForWorld();
 		}
 	}
-	
-	
-	
-	// Delete a single image from the database
-	@DELETE
-	@Path("/{sender}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public ImageModel deleteImageForUser(@PathParam("sender") String sender){
-		
-		// FOR COMPILER
-		return new ImageModel();
+
+
+
+	@Override
+	public ImageWrapper deleteImageForUser(String sender) {
+
+		return new ImageWrapper();
 	}
 }
