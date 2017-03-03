@@ -48,11 +48,7 @@ public class S3ImageStorage implements IImageStorage {
 	
 	@Override
 	public void saveFile() {
-		
-		// OLD : AKIAJJJHRCTK52Y46E3Q, SlbWqonZbBSVSVSw5zHqDc/Z+629B5zKzB+nxRh
-	    AWSCredentials credentials = new BasicAWSCredentials("AKIAJFQT6ZPD43I6EJ7Q", "x8fJbUXYtO585hyblXgc3Ddp2kIEF31ok0fGVbYI");
-		AmazonS3 s3client = new AmazonS3Client(credentials);
-        Region usWest2 = Region.getRegion(Regions.US_WEST_2);
+	   
         s3client.setRegion(usWest2);
      
 		try {
